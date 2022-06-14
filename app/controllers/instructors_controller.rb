@@ -1,4 +1,6 @@
 class InstructorsController < ApplicationController
+    rescue_from ActiveRecord::RecordNotFound, with: :render_not_found_response
+    rescue_from ActiveRecord::RecordInvalid, with: :render_not_valid_response
     def show
         instructor = Instructor.find_by(id: params[:id])
         render json: instructor
@@ -37,5 +39,13 @@ class InstructorsController < ApplicationController
 
     def instructor_params
         params.permit(:name)
+    end
+
+    def render_not_found_response
+        render json: {error: "Not Found"}, status: :not_found
+    end
+
+    def render_not_valid_response
+        render json: {error: "Name can't be blank"}, status: :unprocessable_entity
     end
 end

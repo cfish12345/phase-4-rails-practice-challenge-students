@@ -1,4 +1,6 @@
 class StudentsController < ApplicationController
+    rescue_from ActiveRecord::RecordNotFound, with: :render_not_found_response
+    rescue_from ActiveRecord::RecordInvalid, with: :render_not_valid_response
 
     def index
         if params[:instructor_id]
@@ -28,7 +30,7 @@ class StudentsController < ApplicationController
         else
             render json: {error: "instructor not found"}, status: :not_found
         end
-        render json: student, inlude: :instructor
+        render json: student, include: :instructor
     end
 
     def update
@@ -56,6 +58,14 @@ class StudentsController < ApplicationController
 
     def student_params
         params.permit(:name, :major, :age, :instructor_id)
+    end
+
+    def render_not_found_response
+        render json: {error: "Not Found"}, status: :not_found
+    end
+
+    def render_not_valid_response
+        render json: {error: "Name can't be blank"}, status: :unprocessable_entity
     end
     
 end
